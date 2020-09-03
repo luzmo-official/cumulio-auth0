@@ -1,10 +1,14 @@
 # Multi-tenant integration example with use of Auth0
 
+Follow the steps below to setup a simple webapp that displays a cumul.io dashboard with multi tenancy. Setting this app will allow you to define rules that determine what each user has access to on your dashboard.
+
+Before you begin, you will need a cumul.io account. 
+
 ## I. App install
 
 `npm install`
 
-create an .env file in the root directory with two keys (replace the KEY & TOKEN with the one from your Cumul.io account):
+create a file called '.env' in the root directory with two keys (replace the KEY & TOKEN with the one from your Cumul.io account):
 
 ```
 CUMULIO_API_KEY=XXX
@@ -14,9 +18,7 @@ CUMULIO_API_TOKEN=XXX
 
 ## II. Auth0 setup
 
-  
-
-1. create an account
+1. Create an account [here](https://auth0.com/) 
 
 2. In the Applications menu -> create a new Application of type single web application & javascript & go to settings
 
