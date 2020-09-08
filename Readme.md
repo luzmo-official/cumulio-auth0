@@ -20,7 +20,7 @@ CUMULIO_API_TOKEN=XXX
 
 1. Create an account [here](https://auth0.com/) 
 
-2. In the Applications menu -> create a new Application of type single web application & javascript & go to settings
+2. In the Applications menu create a new Application and select Single Page Web Applications and in Settings:
 
     * copy 'Domain' & 'Client ID' to the same attributes in the auth_config.json file
 
@@ -34,23 +34,23 @@ CUMULIO_API_TOKEN=XXX
         
     * Save the changes
 
-    * In the connections tab: deactive google-oauth2 (to hide social)
+   in Connections: deactive google-oauth2 (to hide social)
 
-3. In the API menu -> copy 'API audience' to the audience attribute in the auth_config.json file
+3. In Applications -> APIs copy 'API audience' next to Auth0 Management API to the audience attribute in the auth_config.json file
 
-4. Add some users:
+4. Add some users in User Management -> Users:
 
     * Go to users & create 2 users: bradpots@exampleapp.com & angelinajulie@exampleapp.com
 
-    * in the `user_metadata` of these users add the following info (firstName & language will be used in the app & department will be used in the dashboard parameter)
+    * in the `user_metadata` of these users add their firstName and language. In `app_metadata` add theur department. (`user_metadata` is meant for user preferences that they could easily change, whereas `app_metadata` is for user information that an admin would control:) 
 
-      for Brad: `{"department": "Antax", "firstName": "Brad", "language": "fr" }`
+      for Brad:  `user_metadata = {"firstName": "Brad", "language": "fr" } app_metadata = {"department": "Quadbase" }`
 
-      for Angelina: `{ "department": "Freshzap", "firstName": "Angelina", "language": "en" }`
+      for Angelina: `user_metadata = {"firstName": "Angelina", "language": "en" } app_metadata = { "department": "Linedoncon"}`
 
 5. In order for the metadata to be able to be extracted from the jwt tokens we need to add a rule.
 
-    * Go to Rules and create a rule with name 'Add user metadata to token' and use the following function:
+    * Go to Auth Pipeline -> Rules and create a rule with name 'Add metadata to token' and use the following function:
 
 
 
@@ -61,6 +61,10 @@ function (user, context, callback) {
   Object.keys(user.user_metadata).forEach((k) => {
     context.idToken[namespace + k] = user.user_metadata[k];
     context.accessToken[namespace + k] = user.user_metadata[k];
+  });
+  Object.keys(user.app_metadata).forEach((k) => {
+    context.idToken[namespace + k] = user.app_metadata[k];
+    context.accessToken[namespace + k] = user.app_metadata[k];
   });
   callback(null, user, context);
 }
