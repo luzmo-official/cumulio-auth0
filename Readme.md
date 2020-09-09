@@ -8,15 +8,21 @@ Before you begin, you will need a cumul.io account.
 
 `npm install`
 
-create a file called '.env' in the root directory with two keys (replace the KEY & TOKEN with the one from your Cumul.io account):
+Create a file called '.env' in the root directory with two keys. Replace the KEY & TOKEN with the one from your Cumul.io account. You can create one in your Profile settings under API Tokens:
 
 ```
 CUMULIO_API_KEY=XXX
 CUMULIO_API_TOKEN=XXX
 ```
   
+## II. Create a dashboard
 
-## II. Auth0 setup
+  
+Here we will use the United Widgets Sales dataset. First, you will have to create a new dashboard. Then you can find the dataset in DATA -> Add new dataset (+) -> Demo Data. Here select United Widgets Sales dataset and Imort.
+
+Create a dashboard with a parameter `department` of type `Hierarchy[]` and use it in a dashboard filters on United Widgets - Sales.
+
+## III. Auth0 setup
 
 1. Create an account [here](https://auth0.com/) 
 
@@ -42,7 +48,7 @@ CUMULIO_API_TOKEN=XXX
 
     * Go to users & create 2 users: bradpots@exampleapp.com & angelinajulie@exampleapp.com
 
-    * in the `user_metadata` of these users add their firstName and language. In `app_metadata` add theur department. (`user_metadata` is meant for user preferences that they could easily change, whereas `app_metadata` is for user information that an admin would control:) 
+    * in the `user_metadata` of these users add their firstName and language. In `app_metadata` add their department. (`user_metadata` is meant for user preferences that they could easily change, whereas `app_metadata` is for user information that an admin would control:) 
 
       for Brad:  `user_metadata = {"firstName": "Brad", "language": "fr" } app_metadata = {"department": "Quadbase" }`
 
@@ -72,14 +78,6 @@ function (user, context, callback) {
 
   
 
-## III. Create a dashboard
-
-  
-
-Create a dashboard with a parameter `department` of type `Hierarchy[]` and use it in a dashboard filters on United Widgets - Sales.
-
-  
-
 ## IV. Run the app and add your dashboard
   1. `npm run start` or if you do not have nodemon, use: `node server.js`
   2. In server.js in the app.get('/authorization'... set the dashboardId to the id you want to use
@@ -88,7 +86,7 @@ Create a dashboard with a parameter `department` of type `Hierarchy[]` and use i
 
   
 
-## X. Final remarks
+## V. Final remarks
 
   * If you want to use other parameters add them to:
     1. the dashboard
