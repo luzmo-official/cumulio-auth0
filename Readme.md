@@ -18,7 +18,7 @@ CUMULIO_API_TOKEN=XXX
 ## II. Create a dashboard
 
   
-Here we will use the United Widgets Sales dataset. First, you will have to create a new dashboard. Then you can find the dataset in DATA -> Add new dataset (+) -> Demo Data. Here select United Widgets Sales dataset and Imort.
+Here we will use the United Widgets Sales dataset. First, you will have to create a new dashboard. Then you can find the dataset in DATA -> Add new dataset (+) -> Demo Data. Here select United Widgets Sales dataset and Import.
 
 Create a dashboard with a parameter `department` of type `Hierarchy[]` and use it in a dashboard filters on United Widgets - Sales.
 
@@ -81,7 +81,7 @@ function (user, context, callback) {
 ## IV. Run the app and add your dashboard
   1. `npm run start` or if you do not have nodemon, use: `node server.js`
   2. In server.js in the app.get('/authorization'... set the dashboardId to the id you want to use
-  3. In public/app.js set the dashboardId to the id you want to use
+  3. In public/js/app.js set the dashboardId to the id you want to use
   4. reload and you're set!
 
   
