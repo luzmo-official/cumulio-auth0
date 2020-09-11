@@ -3,26 +3,15 @@
 Follow the steps below to setup a simple webapp that displays a cumul.io dashboard with multi tenancy. Setting this app will allow you to define rules that determine what each user has access to on your dashboard.
 
 Before you begin, you will need a cumul.io account. 
-
-## I. App install
-
-`npm install`
-
-Create a file called '.env' in the root directory with two keys. Replace the KEY & TOKEN with the one from your Cumul.io account. You can create one in your Profile settings under API Tokens:
-
-```
-CUMULIO_API_KEY=XXX
-CUMULIO_API_TOKEN=XXX
-```
   
-## II. Create a dashboard
+## I. Create a dashboard
 
   
 Here we will use the United Widgets Sales dataset. First, you will have to create a new dashboard. Then you can find the dataset in DATA -> Add new dataset (+) -> Demo Data. Here select United Widgets Sales dataset and Import.
 
 Create a dashboard with a parameter `department` of type `Hierarchy[]` and use it in a dashboard filters on United Widgets - Sales.
 
-## III. Auth0 setup
+## II. Auth0 setup
 
 1. Create an account [here](https://auth0.com/) 
 
@@ -76,7 +65,16 @@ function (user, context, callback) {
 }
 ```
 
-  
+## III. App install
+
+`npm install`
+
+Create a file called '.env' in the root directory with two keys. Replace the KEY & TOKEN with the one from your Cumul.io account. You can create one in your Profile settings under API Tokens:
+
+```
+CUMULIO_API_KEY=XXX
+CUMULIO_API_TOKEN=XXX
+``` 
 
 ## IV. Run the app and add your dashboard
   1. `npm run start` or if you do not have nodemon, use: `node server.js`
