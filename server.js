@@ -6,6 +6,7 @@ const { join } = require('path');
 const app = express();
 const authConfig = require('./auth_config.json');
 const Cumulio = require('cumulio');
+const dashboardId = '04cf04c4-c7b2-49a9-99d8-05e232244d94';
 
 const checkJwt = jwt({
   secret: jwksRsa.expressJwtSecret({
@@ -27,7 +28,6 @@ const client = new Cumulio({
 
 app.get('/authorization', checkJwt, (req, res) => {
   const authNamespace = 'https://myexampleapp/';
-  const dashboardId = 'ac8d802d-1bca-4ea2-bc75-2cda52e7026b';
   client.create('authorization', {
     type: 'temporary',
     expiry: '1 day',
@@ -37,7 +37,7 @@ app.get('/authorization', checkJwt, (req, res) => {
       'department': [req.user[authNamespace + 'department']]
     }
   })
-    .then(function (result) {
+    .then((result) => {
       return res.status(200).json(result);
     });
 });
