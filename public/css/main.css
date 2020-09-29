@@ -66,6 +66,7 @@ body {
   flex: 1 1 auto;
   padding: 1rem;
   background-color: #eef3f6;
+  overflow: auto;
 }
 
 /* Sidebar styling */
