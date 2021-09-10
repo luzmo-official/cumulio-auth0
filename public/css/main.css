@@ -1,7 +1,7 @@
 html,
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
-    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
 
 #gated-content {
@@ -17,7 +17,7 @@ body {
   width: 20rem;
   z-index: 10001;
   transform: translateX(-20rem);
-  transition: all .3s ease-in-out;
+  transition: all 0.3s ease-in-out;
 }
 
 #sidebar.open {
@@ -27,7 +27,7 @@ body {
 .main-container {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: auto;
   width: 100%;
 }
 
@@ -39,7 +39,7 @@ body {
   bottom: 0;
   right: 0;
   z-index: 9999;
-  background-color: rgba(0,0,0,.4);
+  background-color: rgba(0, 0, 0, 0.4);
   cursor: pointer;
 }
 
@@ -47,7 +47,7 @@ body {
   display: block;
 }
 
-.menu-toggle{ 
+.menu-toggle {
   max-height: 3rem;
   width: 4rem;
   display: inline-block;
@@ -92,7 +92,7 @@ body {
 }
 
 #sidebar li:after {
-  content: '';
+  content: "";
   background: transparent;
   width: 0rem;
   height: 0rem;
@@ -186,7 +186,6 @@ body {
     width: calc(100% - 20rem);
     flex-direction: column;
     align-items: stretch;
-    overflow: hidden;
   }
 
   #overlay {

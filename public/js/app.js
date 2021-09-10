@@ -1,27 +1,14 @@
-
-// dashboard configuration for integration
-const dashboardId = 'ac8d802d-1bca-4ea2-bc75-2cda52e7026b';
-const dashboardOptions = {
-  dashboardId: dashboardId,
-  container: '#dashboard-container',
-  loader: {
-    background: '#EEF3F6',
-    spinnerColor: '#004CB7',
-    spinnerBackground: '#DCDCDC',
-    fontColor: '#000000'
-  }
-}
-
 // Function to add the dashboard to the page using Cumul.io embed
+const dashboardElement = document.getElementById("dashboard");
+
 const loadDashboard = (key, token) => {
   // use tokens if available
   if (key && token) {
-    dashboardOptions.key = key;
-    dashboardOptions.token = token;
+    dashboardElement.dashboardSlug = "multitenancydemo";
+    dashboardElement.authKey = key;
+    dashboardElement.authToken = token;
   }
-  // add the dashboard to the #dashboard-container element
-  Cumulio.addDashboard(dashboardOptions);
-}
+};
 
 // Function to retrieve the dashboard authorization token from the platform's backend
 const getDashboardAuthorizationToken = async () => {
@@ -32,47 +19,47 @@ const getDashboardAuthorizationToken = async () => {
       Make the call to the backend API, using the platform user access credentials in the header
       to retrieve a dashboard authorization token for this user
     */
-    const response = await fetch('/authorization', {
+    const response = await fetch("/authorization", {
       headers: new Headers({
-        Authorization: `Bearer ${accessCredentials}`
-      })
+        Authorization: `Bearer ${accessCredentials}`,
+      }),
     });
-
+    console.log(response);
     // Fetch the JSON result with the Cumul.io Authorization key & token
     const responseData = await response.json();
     return responseData;
-  }
-  catch (e) {
+  } catch (e) {
     // Display errors in the console
     console.error(e);
-    return { error: 'Could not retrieve dashboard authorization token.' };
+    return { error: "Could not retrieve dashboard authorization token." };
   }
 };
 
 // function to load the insight page
 const loadInsightsPage = async () => {
   const authorizationToken = await getDashboardAuthorizationToken();
-  if (authorizationToken.id && authorizationToken.token) {
-    loadDashboard(authorizationToken.id, authorizationToken.token);
+  if (authorizationToken.ssoKey && authorizationToken.ssoToken) {
+    loadDashboard(authorizationToken.ssoKey, authorizationToken.ssoToken);
   }
-}
+};
 
 const toggleMenu = (boolean) => {
   if (boolean) {
-    document.getElementById('sidebar').classList.add('open');
-    document.getElementById('overlay').classList.add('open');
+    document.getElementById("sidebar").classList.add("open");
+    document.getElementById("overlay").classList.add("open");
+  } else {
+    document.getElementById("sidebar").classList.remove("open");
+    document.getElementById("overlay").classList.remove("open");
   }
-  else {
-    document.getElementById('sidebar').classList.remove('open');
-    document.getElementById('overlay').classList.remove('open');
-  }
-}
+};
 
 function changeLanguage(language, elem) {
-  document.querySelectorAll('.language-btn').forEach((el) => { el.classList.remove('active'); });
-  elem.classList.add('active');
+  document.querySelectorAll(".language-btn").forEach((el) => {
+    el.classList.remove("active");
+  });
+  elem.classList.add("active");
   toggleMenu(false);
-  dashboardOptions.language = language;
+  dashboardElement.language = language;
   loadDashboard();
 }
 
@@ -82,32 +69,33 @@ const initUI = async () => {
   if (isAuthenticated) {
     const user = await auth0.getUser();
     setUserDetails(user);
-    document.getElementById('gated-content').style.setProperty('display', 'flex', 'important');
+    document
+      .getElementById("gated-content")
+      .style.setProperty("display", "flex", "important");
     loadInsightsPage();
-  }
-  else {
+  } else {
     login();
   }
 };
 
 // set the user details in the UI
 const setUserDetails = (user) => {
-  console.log(user, namespace);
-  const userLanguage = user[namespace + 'language'];
+  const userLanguage = user[namespace + "language"];
   if (userLanguage) {
-    document.querySelectorAll('.language-btn').forEach((el) => {
-      if (el.textContent === userLanguage) {
-        el.classList.add('active');
+    document.querySelectorAll(".language-btn").forEach((el) => {
+      if (el.dataset.language === userLanguage) {
+        el.classList.add("active");
+      } else {
+        el.classList.remove("active");
       }
-      else {
-        el.classList.remove('active');
-      }
-    })
-    if (dashboardOptions) dashboardOptions.language = userLanguage;
+    });
+    if (dashboardElement) dashboardElement.language = userLanguage;
   }
-  document.getElementById('user-name').textContent = user[namespace + 'firstName'];
-  document.getElementById('user-image').src = '/images/' + user[namespace + 'firstName'].toLowerCase() + '.jpg';
-}
+  document.getElementById("user-name").textContent =
+    user[namespace + "firstName"];
+  document.getElementById("user-image").src =
+    "/images/" + user[namespace + "firstName"].toLowerCase() + ".jpg";
+};
 
 // on page load
 window.onload = async () => {
@@ -121,44 +109,44 @@ window.onload = async () => {
 
   const query = window.location.search;
   // If redirected from login
-  if (query.includes('code=') && query.includes('state=')) {
+  if (query.includes("code=") && query.includes("state=")) {
     // Process the login state
     await auth0.handleRedirectCallback();
     // Set app state based on login
     initUI();
     // Use replaceState to redirect the user away and remove the querystring parameters
-    window.history.replaceState({}, document.title, '/');
+    window.history.replaceState({}, document.title, "/");
   }
   // If not logged in not redirected
   else {
     initUI();
   }
-}
+};
 
 /* Authentication configuration */
 let auth0 = null;
-const namespace = 'https://myexampleapp/';
-const fetchAuthConfig = () => fetch('/auth_config.json');
+const namespace = "https://cumulio/";
+const fetchAuthConfig = () => fetch("/auth_config.json");
 const configureClient = async () => {
   const response = await fetchAuthConfig();
   const config = await response.json();
   auth0 = await createAuth0Client({
     domain: config.domain,
     client_id: config.clientId,
-    audience: config.audience
+    audience: config.audience,
   });
 };
 
 // login function
 const login = async () => {
   await auth0.loginWithRedirect({
-    redirect_uri: window.location.origin
+    redirect_uri: window.location.origin,
   });
 };
 
 // logout function
 const logout = () => {
   auth0.logout({
-    returnTo: window.location.origin
+    returnTo: window.location.origin,
   });
 };
