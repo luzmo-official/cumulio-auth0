@@ -38,7 +38,7 @@ app.get("/authorization", checkJwt, (req, res) => {
       role: req.user[authNamespace + "role"],
       name: req.user[authNamespace + "name"],
       username: req.user[authNamespace + "username"],
-      email: req.user[authNamespace + "email"],
+      email: req.user.email,
       suborganization: req.user[authNamespace + "department"],
       metadata: {
         department: [req.user[authNamespace + "department"]],
