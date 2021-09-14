@@ -26,9 +26,6 @@ const client = new Cumulio({
 
 app.get("/authorization", checkJwt, (req, res) => {
   const authNamespace = "https://cumulio/";
-  // console.log("REQ: ", req);
-  console.log("REQ USER:\n ", req.user);
-  console.log("Integration ID:\n" + req.user[authNamespace + "integration_id"]);
   client
     .create("authorization", {
       type: "sso",
@@ -38,7 +35,7 @@ app.get("/authorization", checkJwt, (req, res) => {
       role: req.user[authNamespace + "role"],
       name: req.user[authNamespace + "name"],
       username: req.user[authNamespace + "username"],
-      email: req.user.email,
+      email: req.user[authNamespace + "email"],
       suborganization: req.user[authNamespace + "department"],
       metadata: {
         department: [req.user[authNamespace + "department"]],
@@ -46,10 +43,12 @@ app.get("/authorization", checkJwt, (req, res) => {
       },
     })
     .then((result) => {
-      console.log(result);
       return res
         .status(200)
         .json({ ssoKey: result.id, ssoToken: result.token });
+    })
+    .catch((error) => {
+      console.log("API Error: " + JSON.stringify(error));
     });
 });
 

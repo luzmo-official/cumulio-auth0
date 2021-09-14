@@ -24,7 +24,6 @@ const getDashboardAuthorizationToken = async () => {
         Authorization: `Bearer ${accessCredentials}`,
       }),
     });
-    console.log(response);
     // Fetch the JSON result with the Cumul.io Authorization key & token
     const responseData = await response.json();
     return responseData;
