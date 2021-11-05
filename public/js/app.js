@@ -1,14 +1,4 @@
-// Function to add the dashboard to the page using Cumul.io embed
-const dashboardElement = document.getElementById("dashboard");
-
-const loadDashboard = (key, token) => {
-  // use tokens if available
-  if (key && token) {
-    dashboardElement.dashboardSlug = "multitenancydemo";
-    dashboardElement.authKey = key;
-    dashboardElement.authToken = token;
-  }
-};
+const dashboardElement = document.querySelector('cumulio-dashboard');
 
 // Function to retrieve the dashboard authorization token from the platform's backend
 const getDashboardAuthorizationToken = async () => {
@@ -34,24 +24,6 @@ const getDashboardAuthorizationToken = async () => {
   }
 };
 
-// function to load the insight page
-const loadInsightsPage = async () => {
-  const authorizationToken = await getDashboardAuthorizationToken();
-  if (authorizationToken.ssoKey && authorizationToken.ssoToken) {
-    loadDashboard(authorizationToken.ssoKey, authorizationToken.ssoToken);
-  }
-};
-
-const toggleMenu = (boolean) => {
-  if (boolean) {
-    document.getElementById("sidebar").classList.add("open");
-    document.getElementById("overlay").classList.add("open");
-  } else {
-    document.getElementById("sidebar").classList.remove("open");
-    document.getElementById("overlay").classList.remove("open");
-  }
-};
-
 function changeLanguage(language, elem) {
   document.querySelectorAll(".language-btn").forEach((el) => {
     el.classList.remove("active");
@@ -62,16 +34,54 @@ function changeLanguage(language, elem) {
   loadDashboard();
 }
 
+// Function to fetch tabs & dashboards from the backend
+const fetchAndLoadDashboards = async () => {
+  // Get the dashboards in the integration
+  dashboardElement.getAccessibleDashboards()
+  .then(dashboards => {
+    const menu = document.getElementById('tabs');
+    if (dashboards.length > 0) {
+      dashboardElement.dashboardId = dashboards[0].id;
+      dashboards.forEach((dashboard, i) => {
+        const newOption = document.createElement('li');
+        if (i === 0) newOption.classList.toggle('active');
+        newOption.classList.add('nav-item');
+        const localizedName = dashboard.name[Object.keys(dashboard.name)[0]];
+        newOption.innerHTML = `
+            <a class="menu-item">${localizedName ? localizedName : 'Dashboard -' + i}</a>
+          `;
+        newOption.onclick = () => {
+          dashboardElement.dashboardId = dashboard.id;
+          const options = menu.querySelectorAll('li');
+          for (const option of options) {
+            if (option.isSameNode(newOption)) option.classList.add('active');
+            else option.classList.remove('active');
+          }
+        };
+        menu.appendChild(newOption);
+      });
+    }
+  });
+};
+
+
 // loads the user interface
 const initUI = async () => {
   const isAuthenticated = await auth0.isAuthenticated();
   if (isAuthenticated) {
-    const user = await auth0.getUser();
-    setUserDetails(user);
-    document
-      .getElementById("gated-content")
-      .style.setProperty("display", "flex", "important");
-    loadInsightsPage();
+    getDashboardAuthorizationToken()
+    .then(authorization => {
+      // We can now set the key and token to the dashboard component.
+      dashboardElement.authKey = authorization.ssoKey;
+      dashboardElement.authToken = authorization.ssoToken;
+      return fetchAndLoadDashboards();
+    })
+    .then(() => {
+      return auth0.getUser();
+    })
+    .then(user => {
+      return setUserDetails(user);
+    })
   } else {
     login();
   }
@@ -92,8 +102,7 @@ const setUserDetails = (user) => {
   }
   document.getElementById("user-name").textContent =
     user[namespace + "firstName"];
-  document.getElementById("user-image").src =
-    "/images/" + user[namespace + "firstName"].toLowerCase() + ".jpg";
+  document.getElementById("user-image").src = user['picture'];
 };
 
 // on page load
@@ -122,9 +131,20 @@ window.onload = async () => {
   }
 };
 
+const toggleMenu = (boolean) => {
+  if (boolean) {
+    document.getElementById('sidebar').classList.add('open');
+    document.getElementById('overlay').classList.add('open');
+  }
+  else {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlay').classList.remove('open');
+  }
+};
+
 /* Authentication configuration */
 let auth0 = null;
-const namespace = "https://cumulio/";
+const namespace = "https://myexampleapp/";
 const fetchAuthConfig = () => fetch("/auth_config.json");
 const configureClient = async () => {
   const response = await fetchAuthConfig();

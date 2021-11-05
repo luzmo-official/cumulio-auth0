@@ -6,7 +6,7 @@ body {
 
 #gated-content {
   height: 100%;
-  display: none !important;
+  display: flex;
 }
 
 #sidebar {
@@ -28,6 +28,7 @@ body {
   flex-direction: column;
   overflow: auto;
   width: 100%;
+  padding: 0px 24px;
 }
 
 #overlay {

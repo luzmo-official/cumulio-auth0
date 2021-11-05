@@ -21,31 +21,38 @@ const checkJwt = jwt({
 
 const client = new Cumulio({
   api_key: process.env.CUMULIO_API_KEY,
-  api_token: process.env.CUMULIO_API_TOKEN,
+  api_token: process.env.CUMULIO_API_TOKEN
 });
 
+// Get temporary token based on parameters of user known at auth0
 app.get("/authorization", checkJwt, (req, res) => {
-  const authNamespace = "https://cumulio/";
-  client
-    .create("authorization", {
-      type: "sso",
-      expiry: "24 hours",
-      inactivity_interval: "30 minutes",
-      integration_id: req.user[authNamespace + "integration_id"],
-      role: req.user[authNamespace + "role"],
-      name: req.user[authNamespace + "name"],
-      username: req.user[authNamespace + "username"],
-      email: req.user[authNamespace + "email"],
-      suborganization: req.user[authNamespace + "department"],
-      metadata: {
-        department: [req.user[authNamespace + "department"]],
-        join_date: [req.user[authNamespace + "join_date"]],
-      },
+  const authNamespace = "https://myexampleapp/";
+  // Fill general authorization options, dashboard_id based on request
+  let token = {
+    type: "sso",
+    expiry: "1 day",
+    inactivity_interval: "10 minutes",
+    integration_id: req.user[authNamespace + "integration_id"],
+    role: req.user[authNamespace + "role"],
+    username: req.user[authNamespace + "username"],
+    name: req.user[authNamespace + "name"],
+    email: req.user[authNamespace + "email"],
+    suborganization: req.user[authNamespace + "suborganization"]
+  };
+
+  // Fill parameters based on parameters of user known at auth0
+  if (req.user && req.user[authNamespace + "parameters"]) {
+    if(!token.metadata) token.metadata = {};
+    Object.keys(req.user[authNamespace + "parameters"]).forEach(parameter => {
+      token.metadata[parameter] = req.user[authNamespace + "parameters"][parameter];
     })
-    .then((result) => {
-      return res
-        .status(200)
-        .json({ ssoKey: result.id, ssoToken: result.token });
+  };
+
+  // Create the sso authorization
+  client.create("authorization", token)
+    .then(function (result) {
+      // return the token & key
+      return res.status(200).json({ ssoKey: result.id, ssoToken: result.token });
     })
     .catch((error) => {
       console.log("API Error: " + JSON.stringify(error));

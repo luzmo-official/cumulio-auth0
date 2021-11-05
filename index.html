@@ -11,17 +11,15 @@
     <link rel="icon" href="/images/favicon.ico" type="image/x-icon" />
     <!-- add cumul.io embed script or install & use cumulio-react, cumulio-react-native or angular lib ngx-cumulio -->
     <script src="https://cdn-a.cumul.io/js/cumulio.min.js"></script>
-    <script type="module">
-      import CumulioDashboard from "https://cdn.skypack.dev/@cumul.io/cumulio-dashboard";
-    </script>
+    <script defer src="https://cdn-a.cumul.io/js/cumulio-dashboard/0.1.0-beta/cumulio-dashboard.min.js" charset="utf-8"></script>
     <title>Example app</title>
   </head>
 
   <body>
-    <div id="gated-content" class="d-flex align-items-stretch w-100">
+    <div id="gated-content" class="align-items-stretch w-100">
       <div id="sidebar" class="d-flex flex-column h-100 text-white p-4">
         <!-- Company logo and name -->
-        <div class="company-logo px-2 w-100 mb-5 mr-4">
+        <div class="company-logo px-2 w-100 mb-5">
           <img src="/images/logo_with_text.svg" onclick="toggleMenu(false)" />
         </div>
         <!-- User name and picture -->
@@ -41,11 +39,7 @@
         </div>
         <!-- menu list-->
         <div class="pages small">
-          <ul class="list-unstyled text-uppercase p-0">
-            <li>Marketing</li>
-            <li>Sales</li>
-            <li>Leads</li>
-            <li class="active" onclick="toggleMenu(false)">Insights</li>
+          <ul id="tabs" class="list-unstyled text-uppercase p-0">
           </ul>
         </div>
         <div class="flex-fill"></div>
@@ -66,7 +60,7 @@
         </div>
       </div>
       <!-- Dashboard container -->
-      <div class="main-container text-center">
+      <div class="main-container text-center flex-fill">
         <div class="page-title text-left font-weight-bold">
           <img
             src="/images/logo_color.svg"

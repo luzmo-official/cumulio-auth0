@@ -1,16 +1,18 @@
 # Multi-tenant integration example with use of Auth0
 
-Follow the steps below to setup a simple webapp that displays a cumul.io dashboard with multi tenancy. Setting this app will allow you to define rules that determine what each user has access to on your dashboard.
+Follow the steps below to setup a simple webapp that displays a [Cumul.io](https://cumul.io) dashboard with multi tenancy. Setting this app will allow you to define rules that determine what each user has access to on your dashboard.
 
-Before you begin, you will need a cumul.io account.
+Before you begin, you will need a [Cumul.io](https://cumul.io) account.
 
 ## I. Create a dashboard
 
-Here we will use the United Widgets Sales dataset. First, you will have to create a new dashboard. Then you can find the dataset in DATA -> Add new dataset (+) -> Demo Data. Here select United Widgets Sales dataset and Import.
+You can create as many dashboards as you'd like.
 
-Create a dashboard with a parameter `department` of type `Hierarchy[]` and use it in a dashboard filters on United Widgets - Sales.
+## II. Create an Integration
 
-## II. Auth0 setup
+Add the dashboards you want to use in this application all into an 'Integration' in Cumul.io. Per user you can determine which integration they will see, so depending on their role, company, license, ... you can control which dashboards they see by creating separate integrations. We will use the Integration ID to create an SSO token and embed the dashboards into the application.
+
+## III. Auth0 setup
 
 1. Create an account [here](https://auth0.com/)
 
@@ -30,13 +32,49 @@ Create a dashboard with a parameter `department` of type `Hierarchy[]` and use i
 
 4. Add some users in User Management -> Users:
 
-   - Go to users & create 2 users: bradpots@exampleapp.com & angelinajulie@exampleapp.com
+   - Go to users & create a user
+   
+   - You should add the following properties to the `user_metadata` of a user:
 
-   - in the `user_metadata` of these users add their firstName and language. In `app_metadata` add their department. (`user_metadata` is meant for user preferences that they could easily change, whereas `app_metadata` is for user information that an admin would control:)
+      - `firstName`
+      - `name`
+      - `email`
+      - `language`
 
-     for Brad: `user_metadata = {"firstName": "Brad", "language": "fr" } app_metadata = {"department": "Quadbase", "integration_id": xxx, ... }`
+      An example of the `user_metadata`:
 
-     for Angelina: `user_metadata = {"firstName": "Angelina", "language": "en" } app_metadata = { "department": "Linedoncon", "integration_id": xxx, ...}`
+      ```json
+        {
+          "firstName": "Angelina",
+          "language": "nl",
+          "email": "angelinajulie@exampleapp.com",
+          "name": "Angelina Julie"
+        }
+      ```
+
+    - You should add the following properties to the `app_metadata` of a user:
+    
+      - `parameters`: object containing parameter names and their values. These parameter filters will **ALWAYS** be applied in the authorization token, so e.g. useful for row-level security per client.
+      - `role`: viewer or designer
+      - `integration_id`: id of the integration the user should see 'see step II Create an Integation'
+      - `suborganization`: [suborganization](https://academy.cumul.io/article/rqn97pna) of the user
+      - `username`: unique, immutable username
+
+          An example of the `app_metadata`:
+
+          ```json
+          {
+              "parameters": {
+                  "<parameter name>": ["<parameter value 1>", "<parameter value 2>"]
+              },
+              "role": "viewer",
+              "integration_id": "xxxxx",
+              "suborganization": "client 1",
+              "username": "123456"
+          }
+          ```
+
+      (`user_metadata` is meant for user preferences that they could easily change, whereas `app_metadata` is for user information that an admin would control)
 
 5. In order for the metadata to be able to be extracted from the jwt tokens we need to add a rule.
 
@@ -62,7 +100,7 @@ function (user, context, callback) {
 
 `npm install`
 
-Create a file called '.env' in the root directory with two keys. Replace the KEY & TOKEN with the one from your Cumul.io account. You can create one in your Profile settings under API Tokens:
+Create a file called '.env' in the root directory with two keys. Replace the KEY & TOKEN with the one from your [Cumul.io account](https://app.cumul.io/start/profile/integration). You can create one in your Profile settings under API Tokens:
 
 ```
 CUMULIO_API_KEY=XXX
@@ -72,16 +110,4 @@ CUMULIO_API_TOKEN=XXX
 ## IV. Run the app and add your dashboard
 
 1. `npm run start` or if you do not have nodemon, use: `node server.js`
-2. In server.js in the app.get('/authorization'... set the dashboardId to the id you want to use
-3. In public/js/app.js set the dashboardId to the id you want to use
-4. reload and you're set!
-
-## V. Final remarks
-
-- If you want to use other parameters add them to:
-
-  1. the dashboard
-  2. the auth0 user
-  3. the server side authorization call to create an sso token
-
-- If you use other first names adapt the images in public/images or use the gravatar link from the user in the index.html
+2. Each time you add/remove dashboards, or change something to server.js you will have to restart the server. Changes to e.g. public/js/app.js do not require a server restart, but could be cached on the client side so it could be that you have to hard-refresh your browser in order to see the changes.
